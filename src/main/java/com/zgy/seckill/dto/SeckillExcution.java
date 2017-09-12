@@ -1,6 +1,7 @@
 package com.zgy.seckill.dto;
 
 import com.zgy.seckill.entity.SuccessKilled;
+import com.zgy.seckill.enums.SeckillStateEnum;
 
 /**
  * 封装秒杀执行后结果
@@ -47,21 +48,33 @@ public class SeckillExcution {
         return successKilled;
     }
 
+    //秒杀成功对象
     public void setSuccessKilled(SuccessKilled successKilled) {
         this.successKilled = successKilled;
     }
 
-    public SeckillExcution(long seckillId, int state, String stateInfo, SuccessKilled successKilled) {
+    public SeckillExcution(long seckillId, SeckillStateEnum seckillStateEnum, SuccessKilled successKilled) {
         this.seckillId = seckillId;
-        this.state = state;
-        this.stateInfo = stateInfo;
+        this.state = seckillStateEnum.getState();
+        this.stateInfo = seckillStateEnum.getStateInfo();
         this.successKilled = successKilled;
     }
 
 
-    public SeckillExcution(long seckillId, int state, String stateInfo) {
+    public SeckillExcution(long seckillId, SeckillStateEnum seckillStateEnum) {
         this.seckillId = seckillId;
-        this.state = state;
-        this.stateInfo = stateInfo;
+        this.stateInfo = seckillStateEnum.getStateInfo();
+        this.successKilled = successKilled;
+        this.successKilled = successKilled;
+    }
+
+    @Override
+    public String toString() {
+        return "SeckillExcution{" +
+                "seckillId=" + seckillId +
+                ", state=" + state +
+                ", stateInfo='" + stateInfo + '\'' +
+                ", successKilled=" + successKilled +
+                '}';
     }
 }

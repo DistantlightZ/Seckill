@@ -8,16 +8,20 @@ import com.zgy.seckill.dto.Exposer;
 import com.zgy.seckill.dto.SeckillExcution;
 import com.zgy.seckill.entity.Seckill;
 import com.zgy.seckill.entity.SuccessKilled;
+import com.zgy.seckill.enums.SeckillStateEnum;
 import com.zgy.seckill.exception.RepeatKillException;
 import com.zgy.seckill.exception.SeckillCloseException;
 import com.zgy.seckill.exception.SeckillException;
 import com.zgy.seckill.service.SeckillService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 
+@Service("seckillService")
 public class SeckillServiceImpl implements SeckillService {
 
     @Resource
@@ -65,28 +69,31 @@ public class SeckillServiceImpl implements SeckillService {
     }
 
     @Override
+    @Transactional
     public SeckillExcution excuteSeckill(long seckillId, long userPhone, String md5) throws SeckillException, RepeatKillException, SeckillCloseException {
+
         if (md5 == null || !md5.equals(getMd5(seckillId))) {
             throw new SeckillException("seckill data rewrite");
         }
         Date nowDate = new Date();
         //执行秒杀操作，减少库存
         //输入秒杀id和时间
-        int updateCount = seckillDao.reduceNum(seckillId,nowDate);
+        int updateCount = seckillDao.reduceNum(seckillId, nowDate);
         if (updateCount <= 0) {
             //没有更新到记录
             throw new SeckillCloseException("seckill is closed");
         } else {
             //秒杀成功，记录购买行为
-            int insertCount = successKilledDao.insertSuccessKilled(seckillId,userPhone);
+            int insertCount = successKilledDao.insertSuccessKilled(seckillId, userPhone);
             if (insertCount <= 0) {
                 //重复秒杀
                 throw new RepeatKillException("repeat seckill");
             } else {
-                SuccessKilled successKilled = successKilledDao.queryByIdWithSeckill(seckillId,userPhone);
-                return new SeckillExcution(seckillId,1,"秒杀成功",successKilled);
+                SuccessKilled successKilled = successKilledDao.queryByIdWithSeckill(seckillId, userPhone);
+                return new SeckillExcution(seckillId, SeckillStateEnum.SUCCESS, successKilled);
             }
         }
-                
+
+
     }
 }

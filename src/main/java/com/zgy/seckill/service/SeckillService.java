@@ -19,7 +19,7 @@ public interface SeckillService {
 
     /**
      * 根据id获取单个秒杀信息
-     * @param id
+     * @param seckillId
      * @return
      */
     Seckill getById(long seckillId);
